@@ -8,7 +8,7 @@
 
 Aplikasi ini dilengkapi dengan editor visual interaktif bergaya *software* desain profesional (seperti fitur *Magnetic Snapping* dan *Pan/Zoom*) serta dapat terhubung langsung dengan *database* Google Forms.
 
-## ✨ Fitur Utama (Level Dewa!)
+## ✨ Fitur Utama
 
 * **🎨 Advanced Visual Editor**
     * **Drag & Drop:** Posisikan teks nama dengan kursor secara *real-time*.
