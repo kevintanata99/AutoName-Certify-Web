@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Sertifikat By KLT</title>
+    <link rel="stylesheet" href="css/style.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h1>CREATOR : KEVIN LEONARDO TANATA</h1>
+        
+        <div>
+            <label>1. Upload Template (JPG/PNG)</label>
+            <input type="file" id="template-upload" accept="image/png, image/jpeg">
+        </div>
+
+        <div>
+            <label>2. Sumber Data Nama</label>
+            <select id="data-source-type" style="background-color: #F9FAFB; font-weight: bold;">
+                <option value="upload">📂 Upload File (CSV / Excel)</option>
+                <option value="gform">🔗 Link Google Form / Sheets</option>
+            </select>
+        </div>
+
+        <div id="section-upload">
+            <span class="text-small">Pastikan nama ada di kolom pertama ya!</span>
+            <input type="file" id="data-upload" accept=".csv, .xls, .xlsx">
+        </div>
+
+        <div id="section-gform" style="display: none;">
+            <span class="text-small">Masukkan link Google Sheets "Publish to Web" (CSV)</span>
+            <input type="text" id="gform-link" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+            
+            <label style="margin-top: 10px; display: block; font-size: 0.85rem;">Pertanyaan "Nama" ada di urutan ke-berapa?</label>
+            <input type="number" id="gform-column" value="1" min="1" title="Jika pertanyaan Nama adalah yang pertama di form, isi 1.">
+            <span class="text-small" style="color: #ff0000; margin-top: 5px;">*Urutan pertanyaan di GForm.</span>
+        </div>
+
+        <div>
+            <label>Teks Preview (Contoh Nama)</label>
+            <input type="text" id="sample-name-input" placeholder="Contoh: Kevin Leonardo..." title="Ketik nama untuk melihat preview">
+            <span class="text-small" style="color: #ff0000;">*Hanya contoh, tidak tercetak.</span>
+        </div>
+
+        <div>
+            <label>3. Nama Kegiatan</label>
+            <input type="text" id="file-prefix" value="Seminar_AI" placeholder="Contoh: Seminar_AI">
+            <span class="text-small">Format hasil: NamaPeserta - NamaKegiatan.pdf</span>
+        </div>
+
+        <div>
+            <label>4. Desain Teks & Outline</label>
+            <div class="flex-row">
+                <select id="font-weight" title="Tebal / Normal" style="width: 90px; padding: 5px;">
+                    <option value="bold">Bold</option>
+                    <option value="normal">Normal</option>
+                </select>
+                <input type="color" id="font-color-picker" value="#000000" title="Warna Teks">
+                <input type="text" id="font-color-hex" value="#000000" title="Kode Hex Warna">
+                <input type="number" id="font-size" value="48" title="Ukuran Font" min="10" max="150">
+            </div>
+            
+            <label style="margin-top: 10px; display: block; font-size: 0.85rem;">Garis Tepi (Outline):</label>
+            <div class="flex-row">
+                <input type="color" id="outline-color" value="#FFFFFF" title="Warna Outline">
+                <input type="number" id="outline-width" value="0" title="Tebal Outline" min="0" max="20">
+                <span class="text-small" style="margin-top: 0;">px</span>
+            </div>
+            
+            <select id="font-family" style="margin-top: 10px;">
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', serif">Times New Roman</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="Verdana, sans-serif">Verdana</option>
+                <option value="Tahoma, sans-serif">Tahoma</option>
+                <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                <option value="Impact, sans-serif">Impact (Tebal)</option>
+                
+                <option value="'Monotype Corsiva', cursive">Monotype Corsiva (Latin Elegan)</option>
+                <option value="'Brush Script MT', cursive">Brush Script MT (Latin Kuas)</option>
+                <option value="'Lucida Handwriting', cursive">Lucida Handwriting (Tulis Tangan)</option>
+                <option value="'Bookman Old Style', serif">Bookman Old Style (Klasik)</option>
+                
+                <!-- Font Custome-->
+                <option value="'Black Mountain', cursive">Black Mountain</option>
+
+                <option value="custom" style="font-weight: bold; color: var(--primary);">+ Upload Font Custom (.ttf/.otf)...</option>
+            </select>
+            
+            <div id="custom-font-container" style="display: none; margin-top: 10px;">
+                <input type="file" id="custom-font-upload" accept=".ttf, .otf">
+            </div>
+        </div>
+
+        <div>
+            <label>5. Posisi Teks (%)</label>
+            <div class="coord-info flex-row">
+                <label style="width: 20px;">X:</label>
+                <input type="number" id="input-x" value="50.00" step="0.1" min="0" max="100">
+                <label style="width: 20px; margin-left: 10px;">Y:</label>
+                <input type="number" id="input-y" value="50.00" step="0.1" min="0" max="100">
+            </div>
+        </div>
+
+        <div>
+            <label>6. Format Output</label>
+            <select id="output-format">
+                <option value="pdf">PDF</option>
+                <option value="png">PNG</option>
+            </select>
+        </div>
+
+        <div class="flex-row" style="margin-top: 15px;">
+            <button type="button" id="preview-btn" style="background-color: #008cff; margin-top: 0;">Full Preview</button>
+            <button type="button" id="generate-btn" style="background-color: #06c000; margin-top: 0;">Download ZIP</button>
+        </div>
+        <button type="button" id="reset-btn" style="background-color: #ff0e0e; margin-top: 10px;">Reset ke Default</button>
+        <div id="status-text" style="font-size: 0.8rem; color: #4F46E5; text-align: center; margin-top: 5px; display: none;">Memproses... Mohon tunggu ya!</div>
+    </div>
+
+    <div class="preview-area">
+        <div id="certificate-container">
+            <div id="guide-v" style="display:none; position:absolute; left:50%; top:0; bottom:0; width:2px; background:#EC4899; z-index:10; pointer-events:none; transform:translateX(-50%); box-shadow: 0 0 5px rgba(255,255,255,0.8);"></div>
+            <div id="guide-h" style="display:none; position:absolute; top:50%; left:0; right:0; height:2px; background:#EC4899; z-index:10; pointer-events:none; transform:translateY(-50%); box-shadow: 0 0 5px rgba(255,255,255,0.8);"></div>
+            <div id="draggable-name">NAMA MAHASISWA</div>
+        </div>
+    </div>
+
+    <div id="preview-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
+        <span id="close-modal" style="position: absolute; top: 20px; right: 40px; font-size: 50px; color: white; cursor: pointer; user-select: none;">&times;</span>
+        <h3 style="color: white; margin-bottom: 15px; font-family: sans-serif;">Hasil Akhir (Resolusi Asli)</h3>
+        <img id="preview-image" style="max-width: 90%; max-height: 80vh; border: 2px solid white; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/engine.js"></script>
+</body>
+</html>
